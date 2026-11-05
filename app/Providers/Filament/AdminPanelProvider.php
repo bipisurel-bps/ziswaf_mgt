@@ -26,12 +26,19 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName(config('ziswaf.org.name'))
-            ->colors(['primary' => Color::Emerald])
+            ->brandName(config('ziswaf.org.name') . ' — jaddadeveloper')
+            ->colors(['primary' => Color::Blue])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([Pages\Dashboard::class])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->widgets([
+                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\DonationTrendChart::class,
+                \App\Filament\Widgets\FundDistributionChart::class,
+                \App\Filament\Widgets\PendingDisbursementsWidget::class,
+                \App\Filament\Widgets\LatestDonationsWidget::class,
+            ])
+            ->renderHook('panels::footer', fn () => view('filament.components.footer'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

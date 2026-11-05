@@ -5,13 +5,13 @@
 <style>
     @page { margin: 20px; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1c1917; }
-    .box { border: 2px solid #047857; padding: 16px; }
-    h1 { font-size: 16px; margin: 0; color: #065f46; }
+    .box { border: 2px solid #1e40af; padding: 16px; border-radius: 6px; }
+    h1 { font-size: 16px; margin: 0; color: #1e3a8a; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     td { padding: 4px 0; vertical-align: top; }
-    td.l { width: 28%; color: #57534e; }
-    .amt { font-size: 18px; font-weight: bold; color: #065f46; }
-    .muted { color: #78716c; font-size: 9px; }
+    td.l { width: 28%; color: #475569; }
+    .amt { font-size: 18px; font-weight: bold; color: #1e40af; }
+    .muted { color: #64748b; font-size: 9px; }
 </style>
 </head>
 <body>
@@ -20,7 +20,7 @@
         <td><h1>{{ $org['name'] }}</h1><div class="muted">{{ $org['address'] }}</div></td>
         <td style="text-align:right"><b>KWITANSI DONASI</b><br>{{ $donation->invoice_number }}</td>
     </tr></table>
-    <hr>
+    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 8px 0;">
     <table>
         <tr><td class="l">Telah diterima dari</td><td>: {{ $donation->display_name }}</td></tr>
         <tr><td class="l">Akad</td><td>: {{ $akad }}</td></tr>
@@ -31,7 +31,13 @@
         @if ($donation->doa_harapan)<tr><td class="l">Doa / harapan</td><td>: {{ $donation->doa_harapan }}</td></tr>@endif
     </table>
     <table style="margin-top:14px"><tr>
-        <td class="muted">Semoga Allah menerima amal Anda dan memberkahi harta yang tersisa.<br>Pindai QR untuk memverifikasi keaslian kwitansi.</td>
+        <td class="muted">
+            Semoga Allah menerima amal Anda dan memberkahi harta yang tersisa.<br>
+            Pindai QR untuk memverifikasi keaslian kwitansi.<br>
+            <span style="font-size: 8px; color: #94a3b8; margin-top: 4px; display: inline-block;">
+                © {{ date('Y') }} jaddadeveloper (part of jadda ecosystem). All rights reserved.
+            </span>
+        </td>
         <td style="text-align:right"><img src="{{ $qr }}" width="90" height="90" alt="QR"></td>
     </tr></table>
 </div>

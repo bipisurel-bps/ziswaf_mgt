@@ -6,9 +6,10 @@ return [
     | Identitas lembaga (tampil di kwitansi & halaman publik)
     */
     'org' => [
-        'name' => env('ORG_NAME', 'Lembaga ZISWAF Contoh'),
+        'name' => env('ORG_NAME', 'Lembaga ZISWAF Amanah'),
         'address' => env('ORG_ADDRESS', 'Jl. Contoh No. 1, Jakarta'),
         'phone' => env('ORG_PHONE', '6281234567890'),
+        'copyright' => 'jaddadeveloper (part of jadda ecosystem)',
     ],
 
     /*
