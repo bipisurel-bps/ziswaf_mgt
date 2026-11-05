@@ -1,0 +1,109 @@
+# Production stack for an Ubuntu VPS.
+#   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+#
+# .env must define: DOMAIN, NGINX_MODE (http -> https), DB_PASSWORD, APP_KEY, MIDTRANS_*, etc.
+name: ziswaf
+
+x-app: &app
+  build:
+    context: .
+    target: app
+  image: ziswaf-app:latest
+  restart: unless-stopped
+  env_file: .env
+  environment: &app-env
+    APP_ENV: production
+    APP_DEBUG: "false"
+    DB_CONNECTION: pgsql
+    DB_HOST: database
+    DB_PORT: 5432
+    DB_DATABASE: ${DB_DATABASE:-ziswaf}
+    DB_USERNAME: ${DB_USERNAME:-ziswaf}
+    DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+    QUEUE_CONNECTION: database
+  volumes:
+    - app_storage:/var/www/html/storage
+    - public_storage:/var/www/html/storage/app/public
+  depends_on:
+    database:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *app
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+    healthcheck:
+      test: ["CMD-SHELL", "php -v >/dev/null 2>&1 && pgrep php-fpm >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  webserver:
+    build:
+      context: .
+      target: webserver
+    image: ziswaf-web:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN must be set}
+    volumes:
+      - ./docker/nginx/${NGINX_MODE:-http}:/etc/nginx/templates:ro
+      - public_storage:/var/www/html/public/storage:ro
+      - certbot_www:/var/www/certbot:ro
+      - letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - app
+
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-ziswaf}
+      POSTGRES_USER: ${DB_USERNAME:-ziswaf}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+    # No published ports: reachable only from the compose network.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  queue:
+    <<: *app
+    environment:
+      <<: *app-env
+      SKIP_BOOTSTRAP: "1"
+    command: php artisan queue:work --tries=3 --backoff=30 --sleep=3 --max-time=3600
+    depends_on:
+      - app
+
+  scheduler:
+    <<: *app
+    environment:
+      <<: *app-env
+      SKIP_BOOTSTRAP: "1"
+    command: php artisan schedule:work
+    depends_on:
+      - app
+
+  # Run on demand:  docker compose -f docker-compose.prod.yml run --rm certbot <args>
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["tools"]
+    volumes:
+      - certbot_www:/var/www/certbot
+      - letsencrypt:/etc/letsencrypt
+
+volumes:
+  pgdata:
+  app_storage:
+  public_storage:
+  certbot_www:
+  letsencrypt:

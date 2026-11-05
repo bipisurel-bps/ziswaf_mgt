@@ -1,0 +1,77 @@
+# Local development stack.  Usage:  docker compose up -d --build
+# App:  http://localhost:8080     Admin: http://localhost:8080/admin     Postgres: localhost:5432
+name: ziswaf-dev
+
+x-app: &app
+  build:
+    context: .
+    target: dev
+  user: "1000:1000"
+  working_dir: /var/www/html
+  volumes:
+    - .:/var/www/html
+  env_file: .env
+  environment: &app-env
+    DB_CONNECTION: pgsql
+    DB_HOST: database
+    DB_PORT: 5432
+    DB_DATABASE: ${DB_DATABASE:-ziswaf}
+    DB_USERNAME: ${DB_USERNAME:-ziswaf}
+    DB_PASSWORD: ${DB_PASSWORD:-secret}
+  depends_on:
+    database:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *app
+
+  webserver:
+    image: nginx:1.27-alpine
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/dev:/etc/nginx/templates:ro
+    depends_on:
+      - app
+
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-ziswaf}
+      POSTGRES_USER: ${DB_USERNAME:-ziswaf}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "127.0.0.1:${DB_FORWARD_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  queue:
+    <<: *app
+    command: php artisan queue:work --tries=3 --backoff=30 --sleep=3 --max-time=3600
+    restart: unless-stopped
+
+  scheduler:
+    <<: *app
+    command: php artisan schedule:work
+    restart: unless-stopped
+
+  # Optional: Vite dev server with HMR.  docker compose --profile assets up -d
+  vite:
+    profiles: ["assets"]
+    image: node:20-alpine
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:

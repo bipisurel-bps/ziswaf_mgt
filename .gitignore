@@ -1,0 +1,71 @@
+# ---- Framework / dependencies ----
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+.phpunit.cache
+.phpunit.result.cache
+.phpactor.json
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# ---- Secrets & credentials (NEVER commit) ----
+# Midtrans server/client keys, Fonnte token, APP_KEY, DB passwords live in .env only.
+.env
+.env.*
+!.env.example
+auth.json
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+secrets/
+credentials*.json
+service-account*.json
+/docker/certbot/
+/letsencrypt/
+
+# ---- Runtime data ----
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
+/storage/app/*
+!/storage/app/.gitignore
+!/storage/app/public/
+/storage/app/public/*
+!/storage/app/public/.gitignore
+# Generated receipts / proofs may contain donor data
+*.pdf
+/storage/**/*.pdf
+
+# ---- Database dumps & backups ----
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.bak
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+/database/*.sqlite
+/backups/
+/dumps/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+.fleet/
+.zed/
+*.swp
+.DS_Store
+Thumbs.db

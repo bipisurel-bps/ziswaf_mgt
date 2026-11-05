@@ -1,0 +1,26 @@
+# BOOTSTRAP MODE (NGINX_MODE=http): serves the app over HTTP and the Let's Encrypt
+# ACME challenge. Use this first to obtain a certificate, then switch to NGINX_MODE=https.
+server {
+    listen 80;
+    server_name ${DOMAIN} www.${DOMAIN};
+    root /var/www/html/public;
+    index index.php;
+    client_max_body_size 12M;
+    server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass app:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    }
+
+    location ~ /\.(?!well-known).* { deny all; }
+}
