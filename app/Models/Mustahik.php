@@ -12,7 +12,19 @@ class Mustahik extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'nik', 'asnaf_category', 'phone', 'address', 'status_approval'];
+    protected $fillable = [
+        'name',
+        'nik',
+        'family_card_number',
+        'asnaf_category',
+        'income_per_month',
+        'dependents_count',
+        'had_kifayah_score',
+        'phone',
+        'address',
+        'status_approval',
+        'verification_status',
+    ];
 
     protected $hidden = ['nik', 'nik_hash'];
 
@@ -20,7 +32,29 @@ class Mustahik extends Model
         'nik' => 'encrypted',
         'asnaf_category' => AsnafCategory::class,
         'status_approval' => ApprovalStatus::class,
+        'income_per_month' => 'integer',
+        'dependents_count' => 'integer',
+        'had_kifayah_score' => 'float',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Mustahik $m) {
+            // Keep status_approval and verification_status in sync
+            if ($m->isDirty('status_approval') && ! $m->isDirty('verification_status')) {
+                $m->verification_status = $m->status_approval->value;
+            } elseif ($m->isDirty('verification_status') && ! $m->isDirty('status_approval')) {
+                $m->status_approval = ApprovalStatus::tryFrom($m->verification_status) ?? ApprovalStatus::Pending;
+            }
+
+            // Auto calculate had_kifayah_score if income or dependents are set/dirty
+            if ($m->isDirty(['income_per_month', 'dependents_count']) || $m->had_kifayah_score === null) {
+                $calc = app(\App\Services\HadKifayahCalculatorService::class)
+                    ->calculate((int) $m->income_per_month, (int) $m->dependents_count);
+                $m->had_kifayah_score = $calc['score'];
+            }
+        });
+    }
 
     /** Keep a keyed hash of the NIK for uniqueness/lookup without decrypting. */
     public function setNikAttribute(?string $value): void
@@ -51,5 +85,10 @@ class Mustahik extends Model
     public function disbursements(): HasMany
     {
         return $this->hasMany(Disbursement::class);
+    }
+
+    public function disbursementRequests(): HasMany
+    {
+        return $this->hasMany(DisbursementRequest::class);
     }
 }

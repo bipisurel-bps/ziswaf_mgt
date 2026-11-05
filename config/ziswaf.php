@@ -62,6 +62,23 @@ return [
     ],
 
     /*
+    | Had Kifayah (Kebutuhan Minimum Asasi) untuk penilaian Mustahik
+    */
+    'had_kifayah' => [
+        'base_cost' => (int) env('HAD_KIFAYAH_BASE_COST', 3000000),
+        'cost_per_dependent' => (int) env('HAD_KIFAYAH_COST_PER_DEPENDENT', 1000000),
+    ],
+
+    /*
+    | Akuntansi Syariah PSAK 109
+    */
+    'accounting' => [
+        'auto_record_journal' => (bool) env('ACCOUNTING_AUTO_RECORD_JOURNAL', true),
+        // Hak amil dari zakat (misal 12.5% atau 0.125). Set 0 jika tidak otomatis dialokasikan
+        'amil_rate' => (float) env('ACCOUNTING_AMIL_RATE', 0.125),
+    ],
+
+    /*
     | Admin default untuk seeder (WAJIB diganti di produksi)
     */
     'seed_admin' => [

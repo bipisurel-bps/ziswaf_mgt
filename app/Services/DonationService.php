@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PaymentStatus;
+use App\Jobs\RecordDonationJournalEntryJob;
 use App\Jobs\SendDonationReceiptJob;
 use App\Models\Campaign;
 use App\Models\Donation;
@@ -134,5 +135,6 @@ class DonationService
         }
 
         SendDonationReceiptJob::dispatch($donation->id)->afterCommit();
+        RecordDonationJournalEntryJob::dispatch($donation->id)->afterCommit();
     }
 }

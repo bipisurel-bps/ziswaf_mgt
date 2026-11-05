@@ -4,10 +4,13 @@ namespace Tests\Feature;
 
 use App\Filament\Pages\ManageZakatSettings;
 use App\Filament\Resources\CampaignResource;
+use App\Filament\Resources\CoaAccountResource;
+use App\Filament\Resources\DisbursementRequestResource;
 use App\Filament\Resources\DisbursementResource;
 use App\Filament\Resources\DonationResource;
 use App\Filament\Resources\DonorResource;
 use App\Filament\Resources\FundraiserResource;
+use App\Filament\Resources\JournalEntryResource;
 use App\Filament\Resources\MustahikResource;
 use App\Models\Campaign;
 use App\Models\Disbursement;
@@ -35,8 +38,17 @@ class AdminPanelTest extends TestCase
         Donation::factory()->paid()->count(2)->create();
         Mustahik::factory()->create();
 
-        foreach ([CampaignResource::class, DonationResource::class, DonorResource::class,
-            MustahikResource::class, DisbursementResource::class, FundraiserResource::class] as $resource) {
+        foreach ([
+            CampaignResource::class,
+            DonationResource::class,
+            DonorResource::class,
+            MustahikResource::class,
+            DisbursementResource::class,
+            DisbursementRequestResource::class,
+            FundraiserResource::class,
+            CoaAccountResource::class,
+            JournalEntryResource::class,
+        ] as $resource) {
             $this->get($resource::getUrl('index'))->assertOk();
         }
         $this->get('/admin')->assertOk();

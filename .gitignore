@@ -48,6 +48,9 @@ service-account*.json
 *.pdf
 /storage/**/*.pdf
 
+# Temporary office / editor files
+~$*
+
 # ---- Database dumps & backups ----
 *.sql
 *.sql.gz

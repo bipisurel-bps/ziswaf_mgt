@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\InsufficientCampaignBalance;
+use App\Models\CoaAccount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,6 +44,18 @@ class Disbursement extends Model
                     throw new InsufficientCampaignBalance($remaining, $d->amount);
                 }
             });
+        });
+
+        static::created(function (Disbursement $d) {
+            if (config('ziswaf.accounting.auto_record_journal', true) && CoaAccount::exists()) {
+                $exists = JournalEntry::where('reference_type', Disbursement::class)
+                    ->where('reference_id', $d->id)
+                    ->exists();
+
+                if (! $exists) {
+                    app(\App\Services\AccountingService::class)->recordDisbursement($d);
+                }
+            }
         });
     }
 

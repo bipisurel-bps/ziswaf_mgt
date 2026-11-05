@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(CoaAccountSeeder::class);
+
         $admin = config('ziswaf.seed_admin');
         User::updateOrCreate(
             ['email' => $admin['email']],
