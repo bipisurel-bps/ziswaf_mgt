@@ -2,8 +2,11 @@
 
 Aplikasi donasi **Zakat, Infaq, Sedekah & Wakaf** dengan checkout satu halaman, pembayaran Midtrans Snap (webhook idempoten), kalkulator zakat, kwitansi PDF + QR verifikasi, notifikasi WhatsApp (Fonnte), dan back-office Filament (kampanye, donasi, CRM donatur, mustahik, penyaluran).
 
+Dikembangkan dan dikelola oleh **jadda developer** (part of **jadda ecosystem**).
+
 - **Stack:** Laravel 12 (PHP 8.3), Filament v3, Blade + Tailwind CSS 4 + Alpine.js (Vite), PostgreSQL 16, Laravel Queue (database), Midtrans Snap.
 - **Catatan versi:** semua rilis Laravel 11 diblokir Composer karena security advisory, jadi proyek memakai Laravel 12 (PHP 8.2+). Struktur kode sama.
+- **Lisensi:** [MIT License](LICENSE) — Copyright © 2026 jadda developer.
 
 ## Daftar isi
 1. [Arsitektur singkat](#arsitektur-singkat)
@@ -14,6 +17,7 @@ Aplikasi donasi **Zakat, Infaq, Sedekah & Wakaf** dengan checkout satu halaman, 
 6. [Webhook Midtrans](#webhook-midtrans)
 7. [Operasional: backup, update, troubleshooting](#operasional)
 8. [Keamanan](#keamanan)
+9. [Lisensi & Hak Cipta](#lisensi--hak-cipta)
 
 ---
 
@@ -260,3 +264,14 @@ Kunci Sandbox dan Production berbeda. Pastikan `MIDTRANS_IS_PRODUCTION` sesuai k
 - NIK mustahik terenkripsi (`encrypted` cast) + hash HMAC untuk pencarian; tampil tersamar di admin.
 - Kwitansi dan bukti penyaluran disimpan di disk privat; unduhan lewat signed URL (kwitansi berlaku 7 hari).
 - Ganti password admin seeder segera setelah login pertama. Admin panel `/admin` sebaiknya dibatasi (mis. firewall/IP allowlist) bila memungkinkan.
+
+---
+
+## Lisensi & Hak Cipta
+
+Hak Cipta © 2026 **jadda developer** (part of **jadda ecosystem**).
+
+Perangkat lunak ini dirilis dan didistribusikan di bawah lisensi terbuka [MIT License](LICENSE).
+
+Anda diberikan izin secara cuma-cuma untuk menggunakan, menyalin, memodifikasi, menggabungkan, menerbitkan, mendistribusikan, mensublisensikan, dan/atau menjual salinan perangkat lunak ini, dengan syarat pemberitahuan hak cipta dan izin di atas disertakan dalam semua salinan atau bagian substansial dari perangkat lunak.
+
